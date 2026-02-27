@@ -22,6 +22,12 @@
 3. エクスプローラーが開くので、適用したいフォルダの中に入り、**中にある適当なカーソルファイルを一つ選択**してください。
 4. そのフォルダにあるすべての対応カーソルが自動的に設定されます。
 
+### 注意事項
+- **レジストリの変更**: このツールは Windows のレジストリを書き換えます。通常の使用で問題が起きることはありませんが、自己責任でご利用ください。
+- **ファイル名による制限**: ファイル名が特殊な場合（キーワードが含まれていない場合など）、一部のカーソルが自動認識されないことがあります。
+- **元に戻す方法**: 「標準に戻す」ボタンを押すことで、いつでも Windows 標準のカーソルに戻すことができます。
+- **反映されない場合**: カーソルを変更しても見た目が変わらない場合は、一度 PC を再起動するか、再度適用ボタンを押してみてください。
+
 ---
 
 ## English
@@ -41,3 +47,9 @@ A simple tool to change Windows mouse cursors in bulk.
 2. Click the "Apply Cursor Set" button.
 3. When the explorer opens, navigate to your target folder and **select any cursor file inside**.
 4. All corresponding cursors in that folder will be automatically applied.
+
+### Precautions
+- **Registry Modification**: This tool modifies the Windows registry. While safe for normal use, please use it at your own risk.
+- **Filename Limitations**: Some cursor files may not be automatically recognized if their filenames do not contain recognized keywords.
+- **Restoring Defaults**: You can always revert to Windows default cursors by clicking the "Restore Defaults" button.
+- **If Not Reflected**: If cursor changes don't appear immediately, try restarting your PC or clicking the apply button again.

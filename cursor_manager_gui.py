@@ -28,6 +28,8 @@ CURSOR_REG_MAPPING = {
     "SizeAll": ["移動", "13_移動", "移動.ani", "移動.cur", "Move", "SizeAll"],
     "UpArrow": ["代替選択", "代替選択.ani", "代替選択.cur", "Alternate", "UpArrow"],
     "Hand": ["リンクの選択", "15_リンクの選択", "リンクの選択.ani", "リンクの選択.cur", "リンク", "Link", "Hand"],
+    "LocationSelect": ["位置選択", "Location", "Pin", "GPS", "Point"],
+    "PersonSelect": ["ユーザー選択", "Person", "User", "People"],
 }
 
 LANGUAGES = {
@@ -216,27 +218,42 @@ class CursorManagerApp:
         except: return False
 
     def trigger_refresh(self):
-        ctypes.windll.user32.SystemParametersInfoW(SPI_SETCURSORS, 0, 0, SPIF_UPDATE_INIFILE | SPIF_SENDCHANGE)
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETCURSORS, 0, 0, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)
 
     def apply_folder(self, folder_path):
-        all_files = []
-        for f in os.listdir(folder_path):
-            if f.endswith(('.ani', '.cur')):
-                all_files.append(f)
+        all_files = [f for f in os.listdir(folder_path) if f.lower().endswith(('.ani', '.cur'))]
+        
+        applied_mapping = {}
+        used_files = set()
+
+        # Step 1: Exact matches (priority)
+        for reg_name, keywords in CURSOR_REG_MAPPING.items():
+            for filename in all_files:
+                if filename in used_files: continue
+                basename = os.path.splitext(filename)[0].lower()
+                if any(kw.lower() == basename for kw in keywords):
+                    applied_mapping[reg_name] = os.path.join(folder_path, filename)
+                    used_files.add(filename)
+                    break
+
+        # Step 2: Partial matches for remaining
+        for reg_name, keywords in CURSOR_REG_MAPPING.items():
+            if reg_name in applied_mapping: continue
+            for filename in all_files:
+                if filename in used_files: continue
+                basename = os.path.splitext(filename)[0].lower()
+                # Check for "contains" match, prioritize longer keywords
+                sorted_kws = sorted(keywords, key=len, reverse=True)
+                if any(kw.lower() in basename for kw in sorted_kws):
+                    applied_mapping[reg_name] = os.path.join(folder_path, filename)
+                    used_files.add(filename)
+                    break
         
         applied_count = 0
-        for reg_name, keywords in CURSOR_REG_MAPPING.items():
-            matched_file = None
-            for filename in all_files:
-                basename = os.path.splitext(filename)[0]
-                # Match if filename contains a keyword (case-insensitive for English)
-                if any(kw.lower() in basename.lower() for kw in keywords):
-                    matched_file = os.path.join(folder_path, filename)
-                    break
-            
-            val = matched_file if matched_file else ""
+        for reg_name in CURSOR_REG_MAPPING.keys():
+            val = applied_mapping.get(reg_name, "")
             if self.update_registry(reg_name, val):
-                if matched_file: applied_count += 1
+                if val: applied_count += 1
         
         self.trigger_refresh()
         messagebox.showinfo(self.lang["setting_title"], self.lang["msg_success"].format(applied_count, os.path.basename(folder_path)))
