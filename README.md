@@ -10,6 +10,7 @@
 
 ### 特徴
 - **一括適用**: フォルダ内のカーソルを解析し、Windowsの全ポインタをテーマに沿って一括変更します。
+- **グローバル対応**: 日本語だけでなく、英語のファイル名（Normal, Busy, Link など）も自動判別します。
 - **直感的な操作**: 適用したいフォルダ内のファイルを一つ選ぶだけで、そのフォルダ全体が適用されます。
 - **多言語対応**: 日本語と英語をサポートしています。
 - **配布に最適**: インストール不要の `.exe` 形式です。
@@ -29,9 +30,11 @@ A simple tool to change Windows mouse cursors in bulk.
 
 ### Features
 - **Bulk Apply**: Analyzes files in a folder and updates all Windows pointers at once.
+- **Global Support**: Automatically detects both Japanese and common English filenames (Normal, Busy, Link, etc.).
 - **Intuitive**: Just pick any cursor file in your target folder to apply the entire set.
 - **Multi-language**: Supports Japanese and English.
 - **Portable**: Standalone `.exe` format (no Python installation required).
+- **Source Code Included**: The original script (`cursor_manager_gui.py`) is included for transparency.
 
 ### How to Use
 1. Run `CursorApp.exe`.

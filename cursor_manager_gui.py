@@ -11,28 +11,28 @@ SPIF_UPDATEINIFILE = 0x01
 SPIF_SENDCHANGE = 0x02
 REG_CURSOR_PATH = r"Control Panel\Cursors"
 
-# Standard 15 Cursor Categories
+# Global Mapping: Supports both Japanese and common English filename keywords
 CURSOR_REG_MAPPING = {
-    "Arrow": ["通常", "1_通常", "通常.ani", "通常.cur"],
-    "Help": ["ヘルプの選択", "2_ヘルプの選択", "ヘルプ.ani", "ヘルプ.cur"],
-    "AppStarting": ["バックグラウンドで作業中", "3_バックグラウンドで作業中", "バックグラウンド.ani", "バックグラウンド.cur"],
-    "Wait": ["待ち状態", "4_待ち状態", "待ち状態.ani", "待ち状態.cur"],
-    "Crosshair": ["領域選択", "5_領域選択", "領域選択.ani", "領域選択.cur"],
-    "IBeam": ["テキスト選択", "6_テキスト選択", "テキスト選択.ani", "テキスト選択.cur"],
-    "Handwriting": ["手書き", "7_手書き", "手書き.ani", "手書き.cur"],
-    "No": ["利用不可", "8_利用不可", "利用不可.ani", "利用不可.cur"],
-    "SizeNS": ["上下に拡大,縮小", "9_上下に拡大,縮小", "上下.ani", "上下.cur", "上下"],
-    "SizeWE": ["左右に拡大,縮小", "10_左右に拡大,縮小", "左右.ani", "左右.cur", "左右"],
-    "SizeNWSE": ["斜めに拡大,縮小1", "11_斜めに拡大,縮小1", "斜め.ani", "斜め.cur", "斜め"],
-    "SizeNESW": ["斜めに拡大,縮小2", "12_斜めに拡大,縮小2", "斜め2.ani", "斜め2.cur", "斜め2"],
-    "SizeAll": ["移動", "13_移動", "移動.ani", "移動.cur"],
-    "UpArrow": ["代替選択", "代替選択.ani", "代替選択.cur"],
-    "Hand": ["リンクの選択", "15_リンクの選択", "リンクの選択.ani", "リンクの選択.cur", "リンク"],
+    "Arrow": ["通常", "1_通常", "通常.ani", "通常.cur", "Normal", "Default", "Arrow"],
+    "Help": ["ヘルプの選択", "2_ヘルプの選択", "ヘルプ.ani", "ヘルプ.cur", "Help", "Question"],
+    "AppStarting": ["バックグラウンドで作業中", "3_バックグラウンドで作業中", "バックグラウンド.ani", "バックグラウンド.cur", "Working", "Background"],
+    "Wait": ["待ち状態", "4_待ち状態", "待ち状態.ani", "待ち状態.cur", "Wait", "Busy"],
+    "Crosshair": ["領域選択", "5_領域選択", "領域選択.ani", "領域選択.cur", "Cross", "Precision"],
+    "IBeam": ["テキスト選択", "6_テキスト選択", "テキスト選択.ani", "テキスト選択.cur", "Text", "IBeam"],
+    "Handwriting": ["手書き", "7_手書き", "手書き.ani", "手書き.cur", "Handwriting", "Pen"],
+    "No": ["利用不可", "8_利用不可", "利用不可.ani", "利用不可.cur", "Unavailable", "No", "Denied"],
+    "SizeNS": ["上下に拡大,縮小", "9_上下に拡大,縮小", "上下.ani", "上下.cur", "上下", "NS", "NorthSouth", "Vertical"],
+    "SizeWE": ["左右に拡大,縮小", "10_左右に拡大,縮小", "左右.ani", "左右.cur", "左右", "WE", "WestEast", "Horizontal"],
+    "SizeNWSE": ["斜めに拡大,縮小1", "11_斜めに拡大,縮小1", "斜め.ani", "斜め.cur", "斜め", "NWSE", "Diagonal1"],
+    "SizeNESW": ["斜めに拡大,縮小2", "12_斜めに拡大,縮小2", "斜め2.ani", "斜め2.cur", "斜め2", "NESW", "Diagonal2"],
+    "SizeAll": ["移動", "13_移動", "移動.ani", "移動.cur", "Move", "SizeAll"],
+    "UpArrow": ["代替選択", "代替選択.ani", "代替選択.cur", "Alternate", "UpArrow"],
+    "Hand": ["リンクの選択", "15_リンクの選択", "リンクの選択.ani", "リンクの選択.cur", "リンク", "Link", "Hand"],
 }
 
 LANGUAGES = {
     "JP": {
-        "title": "マウスカーソル一括変更ツール",
+        "title": "マウスカーソル一括変更ツール (Global対応版)",
         "btn_apply": "カーソルセットを適用する",
         "btn_reset": "標準に戻す",
         "btn_settings": "言語設定",
@@ -45,7 +45,7 @@ LANGUAGES = {
         "current_path": "現在のパス:",
     },
     "EN": {
-        "title": "Mouse Cursor Bulk Applier",
+        "title": "Mouse Cursor Bulk Applier (Global Version)",
         "btn_apply": "Apply Cursor Set",
         "btn_reset": "Restore Defaults",
         "btn_settings": "Language Settings",
@@ -111,7 +111,7 @@ class CursorManagerApp:
         try:
             if not getattr(self, "cancelled", False) and self.root.winfo_exists():
                 self.root.deiconify()
-        except tk.TclError:
+        except (tk.TclError, AttributeError):
             pass
 
     def load_settings(self):
@@ -194,8 +194,6 @@ class CursorManagerApp:
         ttk.Button(frame, text="OK", command=save_and_close).grid(row=1, column=0, columnspan=2, pady=20)
 
     def select_and_apply(self):
-        # Open file dialog to select ONE cursor file inside the target folder
-        # This makes the cursor files visible in explorer
         file_path = filedialog.askopenfilename(
             title=self.lang["btn_apply"],
             filetypes=[("Cursor files", "*.ani;*.cur")]
@@ -218,7 +216,7 @@ class CursorManagerApp:
         except: return False
 
     def trigger_refresh(self):
-        ctypes.windll.user32.SystemParametersInfoW(SPI_SETCURSORS, 0, 0, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE)
+        ctypes.windll.user32.SystemParametersInfoW(SPI_SETCURSORS, 0, 0, SPIF_UPDATE_INIFILE | SPIF_SENDCHANGE)
 
     def apply_folder(self, folder_path):
         all_files = []
@@ -231,7 +229,8 @@ class CursorManagerApp:
             matched_file = None
             for filename in all_files:
                 basename = os.path.splitext(filename)[0]
-                if any(kw == basename or kw in basename for kw in keywords):
+                # Match if filename contains a keyword (case-insensitive for English)
+                if any(kw.lower() in basename.lower() for kw in keywords):
                     matched_file = os.path.join(folder_path, filename)
                     break
             
